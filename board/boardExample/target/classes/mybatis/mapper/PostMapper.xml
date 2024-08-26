@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fastcampus.ch4.dao.PostDao">
+
+    <resultMap id="postResultMap" type="com.fastcampus.ch4.Post">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="writer" property="writer" jdbcType="VARCHAR"/> <!-- 필수 -->
+        <result column="password" property="password"/>
+        <result column="views" property="views"/>
+        <result column="created" property="created" jdbcType="TIMESTAMP"/>
+        <result column="updated" property="updated" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insertPost" parameterType="Post" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO post (title, content, writer, password)
+        VALUES (#{title}, #{content}, #{writer}, #{password})
+    </insert>
+
+    <select id="selectPostByWriter" parameterType="string" resultMap="postResultMap">
+        SELECT * FROM post WHERE writer = #{writer}
+    </select>
+
+    <select id="selectPostById" parameterType="int" resultMap="postResultMap">
+        SELECT * FROM post WHERE id = #{id}
+    </select>
+
+    <select id ="selectPosts" parameterType="map" resultMap="postResultMap">
+        SELECT * FROM post
+        ORDER BY created DESC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countPosts" resultType="int">
+        SELECT COUNT(*) FROM post
+    </select>
+
+    <delete id="deletePost" parameterType="map">
+        DELETE FROM post
+        WHERE id = #{id} AND password = #{password}
+    </delete>
+
+    <delete id="deleteAllPost">
+        DELETE FROM post
+    </delete>
+
+    <update id="updatePost" parameterType="map">
+        UPDATE post
+        SET
+            title = #{updated.title},
+            content = #{updated.content},
+            password = #{updated.password},
+            writer = #{updated.writer},
+            updated = NOW()
+        WHERE
+            id = #{original.id} AND
+            password = #{original.password}
+    </update>
+
+</mapper>
